@@ -12,7 +12,7 @@ const database = new sqlite3.Database('./city.db', sqlite3.OPEN_READWRITE,(err)=
 
 
 //we will create a table 
-//sql = 'CREATE TABLE cities(id INTEGER PRIMARY KEY, city_name, language, long, lat)';
+//sql = 'CREATE TABLE cities(id INTEGER PRIMARY KEY, city_name, language, lat, long)';
 //database.run(sql);
 /*
 
@@ -162,7 +162,7 @@ const cityData = [
 ];
 
 //insert data into the database
-sql = 'INSERT INTO cities(city_name, language, long, lat) VALUES (?,?,?,?)'
+sql = 'INSERT INTO cities(city_name, language, lat, long) VALUES (?,?,?,?)'
 
 cityData.forEach(city => {
   database.run(sql, city, (err) => {

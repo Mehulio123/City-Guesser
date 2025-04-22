@@ -1,5 +1,11 @@
+const express = require('express');
+const app = express();
 
+//allow gpt key to be imported
 require('dotenv').config({ path: './config.env' });
+const { generateRiddle } = require('./GPT-riddler/gpt.js');
+
+//import the sqlite3 needed to interact with the database
 const sqlite3 = require('sqlite3').verbose();
 let sql;
 
@@ -18,43 +24,147 @@ function getRandomCity() {
   });
 }
 
+//function to get the data for a specific city
+function getCityData(cityName) {
+  return new Promise((resolve, reject) => {
+    const sql = "SELECT * FROM cities WHERE city_name = ?";
+    database.get(sql, [cityName], (err, row) => {
+      if (err) reject(err);
+      else if (!row) reject(new Error("city not found."));
+      else resolve(row);
+    });
+  });
+}
+
+
+//function to figure out city distance 
+function findDistance(city1, city2) {
+  return new Promise((resolve, reject) => {
+    try {
+      const toRadians = (degrees) => degrees * (Math.PI / 180);
+
+      const R = 6371; // Earth's radius in kilometers
+      const lat1 = toRadians(Number(city1.lat));
+      const lat2 = toRadians(Number(city2.lat));
+      const dLat = toRadians(Number(city2.lat) - Number(city1.lat));
+      const dLon = toRadians(Number(city2.long) - Number(city1.long));
+      
+
+      const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(lat1) * Math.cos(lat2) *
+        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      const distance = R * c;
+
+      resolve(distance); // return distance in kilometers
+    } catch (error) {
+      reject(error);
+    }
+  });
+}
+
+
+//taking in input for testing purposes
+const readline = require('readline');
+
+function askQuestion(query) {
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+  });
+
+  return new Promise(resolve => rl.question(query, ans => {
+    rl.close();
+    resolve(ans);
+  }));
+}
+//functions for front end client to use:
+app.listen(5000, () => {console.log("Server started on port 5000")});
+
+app.get("/api/getRandomCity", async (req, res) => {
+  const city = await getRandomCity();
+  res.json(city);
+});
+
+app.get("/api/:name", async (req, res) => {
+  const name = req.params.name;
+  try {
+    const city = await getCityData(name);
+    res.json(city);
+  } catch (err) {
+    res.status(404).json({ error: err.message });
+  }
+});
+
+
+app.post("/api/distance", express.json(), async (req, res) => {
+  const { city1, city2 } = req.body;
+  const distance = await findDistance(city1, city2);
+  res.json({distance});
+});
+
+app.post("/api/generateRiddle", express.json(), async (req, res) => {
+  const { cityName } = req.body;
+  try {
+    const riddle = await generateRiddle(cityName);
+    res.json({ riddle });
+  } catch (err) {
+    console.error("GPT error:", err.message);
+    res.status(500).json({ error: "Failed to generate riddle." });
+  }
+});
+
 //console.log("API key:", process.env.OPENAI_API_KEY);
 
-const { generateRiddle } = require('./GPT-riddler/gpt.js');
+/*
 
 async function main() {
-  try {
-    const selectedCity = await getRandomCity();
-    console.log("Selected city:", selectedCity.city_name);
 
-    const riddle = await generateRiddle(selectedCity.city_name);
-    console.log("Generated riddle:", riddle);
-  } catch (error) {
-    console.error("Error:", error.message);
+  const selectedCity = await getRandomCity();
+  console.log("Selected city:", selectedCity.city_name);
+
+  const riddle = await generateRiddle(selectedCity.city_name);
+  console.log("Generated riddle:", riddle);
+  //take input 
+  const Name  = await askQuestion("Enter a city name: ");
+  //finding data for the city that was guessed
+  const Guesscity = await getCityData(Name);
+  //checking data
+  console.log(Guesscity);
+  console.log(selectedCity);
+
+  if(Guesscity.city_name == selectedCity.city_name) {
+    console.log("Congrats you guessed correctly!");
+  } else {
+    const distance = await findDistance(Guesscity, selectedCity); 
+    console.log("Distance from city:", distance);
   }
 }
 
 main(); 
-
+*/
 
 //DATA BASE SCHEMA
 
 // Everything below this is me coding the framework for the nodejs and sqlite interaction:
 
 
-/*
-const sqlite3 = require('sqlite3').verbose();
-let sql;
+
+//const sqlite3 = require('sqlite3').verbose();
+//let sql;
 
 //connect to the database 
+/*
 const database = new sqlite3.Database('./city.db', sqlite3.OPEN_READWRITE,(err)=> {
   if (err) return console.error(err.message);
 });
 
 //we will create a table 
-//sql = 'CREATE TABLE cities(id INTEGER PRIMARY KEY, city_name, language, long, lat)';
-//database.run(sql);
-/*
+sql = 'CREATE TABLE cities(id INTEGER PRIMARY KEY, city_name, language, lat, long)';
+database.run(sql);
+
 
 // All the cities I want in my game: 
 const cityData = [
@@ -202,7 +312,7 @@ const cityData = [
 ];
 
 //insert data into the database
-sql = 'INSERT INTO cities(city_name, language, long, lat) VALUES (?,?,?,?)'
+sql = 'INSERT INTO cities(city_name, language, lat, long) VALUES (?,?,?,?)'
 
 cityData.forEach(city => {
   database.run(sql, city, (err) => {
@@ -217,7 +327,7 @@ database.all("SELECT * FROM cities", (err, rows) => {
   if (err) return console.error(" Error reading from database:", err.message);
   console.log(" All cities in the database:");
   console.table(rows); // Pretty prints the rows in a table format
-});*/
+}); */
 
 
 

@@ -17,7 +17,7 @@ async function generateRiddle(cityName) {//making a function
         messages: [
         {
             role: "user",
-            content: `Write a fun, slightly tricky riddle about the city "${cityName}". Do NOT mention the city name. Make it 3 lines.`,
+            content: `Write a fun, slightly tricky riddle about the city "${cityName}". Do NOT mention the city name. Make it 7 lines.`,
             },  
         ]
     }); 
