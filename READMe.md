@@ -29,8 +29,7 @@ An AI-powered game where players try to guess cities from GPT generated riddles.
 
 ---
 
-## ⚙️ Installation
-1. Clone the repository  
+## ⚙️ Installation Setup 
    ```bash
    git clone https://github.com/yourusername/cityguessr.git
    cd cityguessr
@@ -42,6 +41,7 @@ An AI-powered game where players try to guess cities from GPT generated riddles.
    npm install
    npm run dev
    Enjoy the game!
+
 
 
 
