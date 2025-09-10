@@ -26,7 +26,6 @@ An AI-powered game where players try to guess cities from GPT generated riddles.
 ## 📸 Demo
  <img width="1795" height="1079" alt="image" src="https://github.com/user-attachments/assets/f53014c0-962a-4ae3-b5c5-eb359f010cdb" />
  
-*(Add a gif or screenshot of gameplay here)*
 
 ---
 
@@ -43,6 +42,7 @@ An AI-powered game where players try to guess cities from GPT generated riddles.
    npm install
    npm run dev
    Enjoy the game!
+
 
 
 
