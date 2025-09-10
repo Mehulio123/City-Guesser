@@ -33,14 +33,15 @@ An AI-powered game where players try to guess cities from GPT generated riddles.
    ```bash
    git clone https://github.com/yourusername/cityguessr.git
    cd cityguessr
-   cd backend
+   cd Server
    npm install
    npm start
    OPEN NEW BASH TERMINAL
-   cd frontend
+   cd Client
    npm install
    npm run dev
    Enjoy the game!
+
 
 
 
